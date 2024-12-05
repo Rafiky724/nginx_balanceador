@@ -1,0 +1,21 @@
+version: '3.9'
+
+networks:
+  red_balanceador: {}
+
+services:
+  web1:
+    image: nginx
+    container_name: web1
+    volumes:
+      - ./servidor_web1:/usr/share/nginx/html
+    networks:
+      - red_balanceador
+
+  web2:
+    image: nginx
+    container_name: web2
+    volumes:
+      - ./servidor_web2:/usr/share/nginx/html
+    networks:
+      - red_balanceador

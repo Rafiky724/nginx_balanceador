@@ -1,0 +1,53 @@
+version: '3.9'
+
+networks:
+  red_balanceador:
+    external: true
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - red_balanceador
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - red_balanceador
+  
+  nginx_exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx_exporter
+    ports:
+      - "9113:9113"
+    networks:
+      - red_balanceador
+    command: 
+      - '-nginx.scrape-uri=http://balanceador/nginx_status'
+  
+  web1_exporter:
+    image: prom/node-exporter:latest
+    container_name: web1_exporter
+    networks:
+      - red_balanceador
+    expose:
+      - "9100"
+
+  web2_exporter:
+    image: prom/node-exporter:latest
+    container_name: web2_exporter
+    networks:
+      - red_balanceador
+    expose:
+      - "9100"
